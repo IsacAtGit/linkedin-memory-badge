@@ -41,15 +41,32 @@ function renderSavedContext(textContent) {
   // Custom design accent styling for saved contextual displays
   badgeElement.style.borderLeft = '4px solid #10b981'; // Thin emerald slate line
 
-  badgeElement.innerHTML = `
-    <div style="display: flex; align-items: flex-start; gap: 12px;">
-      <div style="background: #ecfdf5; border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 14px; font-weight: bold;">🔑</div>
-      <div style="flex: 1;">
-        <h4 class="memory-title" style="color: #065f46;">Recognized Profile</h4>
-        <p class="memory-display-text" style="color: #047857; margin: 4px 0 0 0;">${textContent}</p>
-      </div>
-    </div>
-  `;
+  // Build DOM safely to prevent XSS — never use innerHTML with user data
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display: flex; align-items: flex-start; gap: 12px;';
+
+  const iconBox = document.createElement('div');
+  iconBox.style.cssText = 'background: #ecfdf5; border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 14px; font-weight: bold;';
+  iconBox.textContent = '🔑';
+
+  const contentBox = document.createElement('div');
+  contentBox.style.flex = '1';
+
+  const title = document.createElement('h4');
+  title.className = 'memory-title';
+  title.style.color = '#065f46';
+  title.textContent = 'Recognized Profile';
+
+  const body = document.createElement('p');
+  body.className = 'memory-display-text';
+  body.style.cssText = 'color: #047857; margin: 4px 0 0 0;';
+  body.textContent = textContent; // Safe: textContent auto-escapes HTML
+
+  contentBox.appendChild(title);
+  contentBox.appendChild(body);
+  wrapper.appendChild(iconBox);
+  wrapper.appendChild(contentBox);
+  badgeElement.appendChild(wrapper);
   
   document.body.appendChild(badgeElement);
   
