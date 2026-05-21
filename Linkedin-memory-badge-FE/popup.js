@@ -15,16 +15,21 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Render cards cleanly
+    // Render cards safely to prevent XSS
     entries.forEach(([profileKey, contextText]) => {
       const card = document.createElement('div');
       card.className = 'profile-card';
-      
-      card.innerHTML = `
-        <div class="profile-name">@in/${profileKey}</div>
-        <div class="profile-context">${contextText}</div>
-      `;
-      
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'profile-name';
+      nameEl.textContent = `@in/${profileKey}`; // Safe: textContent auto-escapes
+
+      const contextEl = document.createElement('div');
+      contextEl.className = 'profile-context';
+      contextEl.textContent = contextText; // Safe: textContent auto-escapes
+
+      card.appendChild(nameEl);
+      card.appendChild(contextEl);
       listContainer.appendChild(card);
     });
   });
